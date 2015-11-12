@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+import http.server
+import subprocess
+import sys
+
+
+def handler(command):
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            subprocess.run(command, stdout=self.wfile, stderr=self.wfile)
+
+    return Handler
+
+
+def run(command):
+    http_server = http.server.HTTPServer(('', 80), handler(command))
+    http_server.serve_forever()
+
+
+if __name__ == '__main__':
+    run(sys.argv[1:])

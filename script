@@ -30,7 +30,7 @@ def run(command, port):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='One-track web server.')
-    parser.add_argument('command', type=str, nargs='+',
+    parser.add_argument('command', type=str, nargs=argparse.REMAINDER,
                         help='the command to run (e.g. `echo "Hello, World!"`)')
     parser.add_argument('-p', '--port', type=int, default=DEFAULT_PORT,
                         help='the web server port')

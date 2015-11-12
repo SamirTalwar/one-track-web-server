@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from http import HTTPStatus
 import http.server
 import subprocess
 import sys
@@ -8,7 +9,10 @@ import sys
 def handler(command):
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
-            self.send_response(200)
+            if self.path != '/':
+                self.send_error(HTTPStatus.NOT_FOUND)
+
+            self.send_response(HTTPStatus.OK)
             self.end_headers()
             subprocess.run(command, stdout=self.wfile, stderr=self.wfile)
 

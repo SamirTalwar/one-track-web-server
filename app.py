@@ -3,28 +3,49 @@
 import argparse
 from http import HTTPStatus
 import http.server
+import signal
 import subprocess
+import threading
 
 
 DEFAULT_PORT = 80
 
 
-def handler(command):
-    class Handler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
-            if self.path != '/':
-                self.send_error(HTTPStatus.NOT_FOUND)
+class Server:
+    def __init__(self, command, port):
+        self.command = command
+        self.port = port
 
-            self.send_response(HTTPStatus.OK)
-            self.end_headers()
-            subprocess.run(command, stdout=self.wfile, stderr=self.wfile)
+    def start(self):
+        handler = self._handler()
+        self.http_server = http.server.HTTPServer(('', self.port), handler)
+        try:
+            self.http_server.serve_forever()
+        except KeyboardInterrupt:
+            pass
 
-    return Handler
+    def stop(self):
+        self.http_server.shutdown()
+
+    def _handler(self):
+        command = self.command
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                if self.path != '/':
+                    self.send_error(HTTPStatus.NOT_FOUND)
+
+                self.send_response(HTTPStatus.OK)
+                self.end_headers()
+                subprocess.run(command, stdout=self.wfile, stderr=self.wfile)
+
+        return Handler
 
 
 def run(command, port):
-    http_server = http.server.HTTPServer(('', port), handler(command))
-    http_server.serve_forever()
+    server = Server(command, port)
+    threading.Thread(target=server.start).start()
+    signal.signal(signal.SIGTERM, lambda signum, frame: server.stop())
 
 
 if __name__ == '__main__':

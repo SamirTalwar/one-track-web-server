@@ -22,6 +22,8 @@ Then just head to *http://<your Docker host>/* to see the results.
 
 ## Building
 
-Using Docker:
+    make build
 
-    docker build --tag=samirtalwar/one-track-web-server .
+## Testing
+
+    make check

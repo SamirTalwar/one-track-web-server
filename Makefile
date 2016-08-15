@@ -6,3 +6,7 @@ build:
 check: build
 	./test $(TAG)
 	flake8 app.py
+
+push: build check
+	git push
+	docker push $(TAG)

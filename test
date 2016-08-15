@@ -13,10 +13,10 @@ function main {
     sleep 1
 
     if [[ "$(curl "$(docker-hostname):$(docker-port "$CONTAINER" 80)")" == "$TEST_DATA" ]]; then
-        echo 'Test passed.'
+        echo >&2 'Test passed.'
         exit 0
     else
-        echo 'Test failed.'
+        echo >&2 'Test failed.'
         exit 1
     fi
 }
@@ -29,7 +29,12 @@ function stop {
     local exit_status=$?
     if [[ -n "$CONTAINER" ]]; then
         docker stop "$CONTAINER"
+        local container_exit_status="$(docker wait "$CONTAINER")"
         docker rm "$CONTAINER"
+        if [[ $exit_status -eq 0 && $container_exit_status -ne 0 ]]; then
+            echo >&2 "Container exited with $container_exit_status."
+            exit 1
+        fi
     fi
     exit $exit_status
 }

@@ -1,0 +1,49 @@
+#!/usr/bin/env zsh
+
+set -e
+
+TEST_DATA='Hello, world!'
+IMAGE="$1"
+
+SED="$(command -v gsed || command -v sed)"
+
+function main {
+    start
+    trap stop EXIT TERM
+    sleep 1
+
+    if [[ "$(curl "$(docker-hostname):$(docker-port "$CONTAINER" 80)")" == "$TEST_DATA" ]]; then
+        echo 'Test passed.'
+        exit 0
+    else
+        echo 'Test failed.'
+        exit 1
+    fi
+}
+
+function start {
+    CONTAINER="$(docker run --detach --publish=80 "$IMAGE" echo "$TEST_DATA")"
+}
+
+function stop {
+    local exit_status=$?
+    if [[ -n "$CONTAINER" ]]; then
+        docker stop "$CONTAINER"
+        docker rm "$CONTAINER"
+    fi
+    exit $exit_status
+}
+
+function docker-hostname {
+  if [[ -n "$DOCKER_HOST" && "${DOCKER_HOST:0:6}" == 'tcp://' ]]; then
+    echo "$DOCKER_HOST" | $SED -r 's#^tcp://([^:]+):[0-9]+#\1#'
+  else
+    echo 'localhost'
+  fi
+}
+
+function docker-port {
+  docker port "$1" "$2" | $SED -r 's/^.+?://'
+}
+
+main

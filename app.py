@@ -4,10 +4,9 @@ import argparse
 from http import HTTPStatus
 import http.server
 import subprocess
-import sys
 
 
-DEFAULT_PORT=80
+DEFAULT_PORT = 80
 
 
 def handler(command):
@@ -30,9 +29,11 @@ def run(command, port):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='One-track web server.')
-    parser.add_argument('command', type=str, nargs=argparse.REMAINDER,
-                        help='the command to run (e.g. `echo "Hello, World!"`)')
-    parser.add_argument('-p', '--port', type=int, default=DEFAULT_PORT,
-                        help='the web server port')
+    parser.add_argument(
+            'command', type=str, nargs=argparse.REMAINDER,
+            help='the command to run (e.g. `echo "Hello, World!"`)')
+    parser.add_argument(
+            '-p', '--port', type=int, default=DEFAULT_PORT,
+            help='the web server port')
     args = parser.parse_args()
     run(args.command, args.port)

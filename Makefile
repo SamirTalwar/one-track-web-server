@@ -5,3 +5,4 @@ build:
 
 check: build
 	./test $(TAG)
+	flake8 app.py

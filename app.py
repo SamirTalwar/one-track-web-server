@@ -3,12 +3,13 @@
 import argparse
 from http import HTTPStatus
 import http.server
+import os
 import signal
 import subprocess
 import threading
 
 
-DEFAULT_PORT = 80
+DEFAULT_PORT = 8080
 
 
 class Server:
@@ -54,7 +55,8 @@ if __name__ == '__main__':
             'command', type=str, nargs=argparse.REMAINDER,
             help='the command to run (e.g. `echo "Hello, World!"`)')
     parser.add_argument(
-            '-p', '--port', type=int, default=DEFAULT_PORT,
+            '-p', '--port', type=int,
+            default=os.environ.get('PORT', DEFAULT_PORT),
             help='the web server port')
     args = parser.parse_args()
     run(args.command, args.port)

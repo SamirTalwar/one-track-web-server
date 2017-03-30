@@ -12,7 +12,7 @@ function main {
     trap stop EXIT TERM
     sleep 1
 
-    if [[ "$(curl "$(docker-hostname):$(docker-port "$CONTAINER" 80)")" == "$TEST_DATA" ]]; then
+    if [[ "$(curl "$(docker-hostname):$(docker-port "$CONTAINER" 8080)")" == "$TEST_DATA" ]]; then
         echo >&2 'Test passed.'
         exit 0
     else
@@ -22,7 +22,7 @@ function main {
 }
 
 function start {
-    CONTAINER="$(docker run --detach --publish=80 "$IMAGE" echo "$TEST_DATA")"
+    CONTAINER="$(docker run --detach --publish=8080 "$IMAGE" echo "$TEST_DATA")"
 }
 
 function stop {

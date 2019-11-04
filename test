@@ -1,11 +1,17 @@
 #!/usr/bin/env zsh
 
 set -e
+set -u
+set -o pipefail
 
 TEST_DATA='Hello, world!'
-IMAGE="$1"
 
-SED="$(command -v gsed || command -v sed)"
+if [[ $# -ne 1 ]]; then
+  echo >&2 "Usage: ${0} IMAGE"
+  exit 2
+fi
+
+IMAGE="$1"
 
 function main {
     start
@@ -40,15 +46,15 @@ function stop {
 }
 
 function docker-hostname {
-  if [[ -n "$DOCKER_HOST" && "${DOCKER_HOST:0:6}" == 'tcp://' ]]; then
-    echo "$DOCKER_HOST" | $SED -r 's#^tcp://([^:]+):[0-9]+#\1#'
+  if (( ${+DOCKER_HOST} )) && [[ "${DOCKER_HOST:0:6}" == 'tcp://' ]]; then
+    echo "$DOCKER_HOST" | sed -E 's#^tcp://([^:]+):[0-9]+#\1#'
   else
     echo 'localhost'
   fi
 }
 
 function docker-port {
-  docker port "$1" "$2" | $SED -r 's/^.+?://'
+  docker port "$1" "$2" | sed -E 's/^.+?://'
 }
 
 main

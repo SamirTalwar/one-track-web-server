@@ -2,7 +2,7 @@ TAG = samirtalwar/one-track-web-server
 
 .PHONY: build
 build:
-	docker build --tag=$(TAG) .
+	docker build --pull --tag=$(TAG) .
 
 .PHONY: check
 check: build Pipfile.lock

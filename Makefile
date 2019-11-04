@@ -15,7 +15,7 @@ push: build check
 	docker push $(TAG)
 
 Pipfile.lock: .environment Pipfile
-	pipenv sync
+	pipenv sync --dev
 
 .environment:
 	pipenv install --three
